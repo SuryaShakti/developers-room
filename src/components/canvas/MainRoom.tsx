@@ -2,297 +2,333 @@ import { memo } from 'react'
 import * as THREE from 'three'
 
 /**
- * Full procedural room — NYC minimal loft aesthetic.
- * White walls, light gray concrete floor, dark desk, dual sky-blue monitors.
- * All geometry built from Three.js primitives — no GLTF required.
- *
- * Performance: ~40 draw calls, ~900 triangles — well within Module 3 budget.
- * Shadow casters: 1 directional light only (architecture rule).
+ * Developer battlestation — Gurgaon night aesthetic.
+ * Dark charcoal walls, near-black floor, monitor glow as primary light,
+ * warm amber LED strip, city window on back wall, platform bed on left.
+ * ~48 draw calls — within the ≤50 budget.
  */
 const MainRoom = memo(function MainRoom() {
   return (
     <>
-      {/* ═══ LIGHTING ══════════════════════════════════════════════ */}
+      {/* Scene background — prevents transparent canvas edges */}
+      <color attach="background" args={['#050508']} />
 
-      {/* Diffuse fill — cool daylight white */}
-      <ambientLight color="#EEF4FF" intensity={0.85} />
+      {/* ═══ LIGHTING — glow-driven, no directional shadow caster ═══ */}
 
-      {/* PRIMARY SHADOW CASTER — upper left, simulates window daylight */}
-      <directionalLight
-        position={[-5, 8, 3]}
-        intensity={1.6}
-        color="#FFFCF5"
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-        shadow-camera-near={0.5}
-        shadow-camera-far={28}
-        shadow-camera-left={-8}
-        shadow-camera-right={8}
-        shadow-camera-top={8}
-        shadow-camera-bottom={-8}
-        shadow-bias={-0.0005}
-      />
+      {/* Barely-visible ambient — deep purple-black base */}
+      <ambientLight color="#0a0510" intensity={0.15} />
 
-      {/* Window sky bounce — cool blue fill from left wall window */}
-      <pointLight position={[-4, 2.2, -1.2]} color="#B8D8FF" intensity={3} distance={12} decay={2} />
+      {/* Monitor screen glow — PRIMARY light, cool blue */}
+      <pointLight position={[0.5, 1.35, -3.2]} color="#3a6fff" intensity={2.2} distance={4.2} decay={2} />
 
-      {/* Monitor screen glow — subtle blue fill near desk */}
-      <pointLight position={[0, 1.3, -2.6]} color="#4FC3F7" intensity={0.7} distance={2.8} decay={2} />
+      {/* LED strip behind monitors — warm amber */}
+      <pointLight position={[0.6, 0.88, -4.0]} color="#ff8833" intensity={1.3} distance={2.6} decay={2} />
 
-      {/* Desk lamp warm spot */}
-      <pointLight position={[1.05, 1.18, -3.35]} color="#FFE8C0" intensity={1.4} distance={2.2} decay={2} />
+      {/* Under-desk RGB — purple accent strip */}
+      <pointLight position={[0.6, 0.58, -3.1]} color="#7700ff" intensity={0.9} distance={3.0} decay={2} />
 
-      {/* ═══ FLOOR ═════════════════════════════════════════════════ */}
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+      {/* City window — cool deep blue bleed */}
+      <pointLight position={[2.2, 1.6, -4.1]} color="#1a2a4a" intensity={1.0} distance={5.5} decay={2} />
+
+      {/* Bed side — very dim warm fill so it's not invisible */}
+      <pointLight position={[-3.2, 1.2, -1.8]} color="#3a1800" intensity={0.5} distance={4.0} decay={2} />
+
+      {/* Coffee mug steam warmth */}
+      <pointLight position={[-0.75, 0.95, -3.3]} color="#ff4400" intensity={0.28} distance={0.7} decay={2} />
+
+      {/* ═══ ROOM SHELL ══════════════════════════════════════════════ */}
+
+      {/* Floor — near-black warm concrete */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[9, 9]} />
-        <meshStandardMaterial color="#C9C7C1" roughness={0.88} metalness={0} />
+        <meshStandardMaterial color="#0d0c0b" roughness={0.95} metalness={0.05} />
       </mesh>
 
-      {/* ═══ CEILING ═══════════════════════════════════════════════ */}
+      {/* Ceiling */}
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 3, 0]}>
         <planeGeometry args={[9, 9]} />
-        <meshStandardMaterial color="#FFFFFF" roughness={1.0} metalness={0} />
+        <meshStandardMaterial color="#0e0e0e" roughness={1.0} />
       </mesh>
 
-      {/* ═══ WALLS ═════════════════════════════════════════════════ */}
       {/* Back wall */}
-      <mesh receiveShadow position={[0, 1.5, -4.5]}>
+      <mesh position={[0, 1.5, -4.5]}>
         <planeGeometry args={[9, 3]} />
-        <meshStandardMaterial color="#F5F3EE" roughness={0.95} metalness={0} />
+        <meshStandardMaterial color="#1a1a1a" roughness={0.95} />
       </mesh>
-      {/* Left wall */}
-      <mesh receiveShadow rotation={[0, Math.PI / 2, 0]} position={[-4.5, 1.5, 0]}>
+
+      {/* Left wall — DoubleSide so entrance angle doesn't bleed */}
+      <mesh rotation={[0, Math.PI / 2, 0]} position={[-4.5, 1.5, 0]}>
         <planeGeometry args={[9, 3]} />
-        <meshStandardMaterial color="#F5F3EE" roughness={0.95} metalness={0} />
+        <meshStandardMaterial color="#1a1a1a" roughness={0.95} side={THREE.DoubleSide} />
       </mesh>
+
       {/* Right wall */}
-      <mesh receiveShadow rotation={[0, -Math.PI / 2, 0]} position={[4.5, 1.5, 0]}>
+      <mesh rotation={[0, -Math.PI / 2, 0]} position={[4.5, 1.5, 0]}>
         <planeGeometry args={[9, 3]} />
-        <meshStandardMaterial color="#F0EEE9" roughness={0.95} metalness={0} />
+        <meshStandardMaterial color="#181818" roughness={0.95} />
       </mesh>
 
-      {/* ═══ BASEBOARD TRIM ════════════════════════════════════════ */}
-      <mesh position={[0, 0.055, -4.48]}>
-        <boxGeometry args={[9, 0.11, 0.025]} />
-        <meshStandardMaterial color="#ECEAE4" roughness={0.9} />
-      </mesh>
-      <mesh position={[-4.48, 0.055, 0]} rotation={[0, Math.PI / 2, 0]}>
-        <boxGeometry args={[9, 0.11, 0.025]} />
-        <meshStandardMaterial color="#ECEAE4" roughness={0.9} />
-      </mesh>
-      <mesh position={[4.48, 0.055, 0]} rotation={[0, Math.PI / 2, 0]}>
-        <boxGeometry args={[9, 0.11, 0.025]} />
-        <meshStandardMaterial color="#ECEAE4" roughness={0.9} />
+      {/* ═══ NIGHT CITY WINDOW — back wall, right side ════════════════ */}
+
+      {/* Frame */}
+      <mesh position={[2.1, 1.55, -4.47]}>
+        <boxGeometry args={[2.8, 2.5, 0.06]} />
+        <meshStandardMaterial color="#0f0f0f" roughness={0.3} metalness={0.4} />
       </mesh>
 
-      {/* ═══ WINDOW — left wall, large NYC pane ════════════════════ */}
-      {/* Outer frame box — embedded flush with wall */}
-      <mesh castShadow position={[-4.46, 1.85, -1.2]} rotation={[0, Math.PI / 2, 0]}>
-        <boxGeometry args={[2.9, 2.1, 0.08]} />
-        <meshStandardMaterial color="#FFFFFF" roughness={0.15} metalness={0.05} />
-      </mesh>
-      {/* Glass pane */}
-      <mesh position={[-4.43, 1.85, -1.2]} rotation={[0, Math.PI / 2, 0]}>
-        <planeGeometry args={[2.72, 1.92]} />
+      {/* Glass — deep navy, barely transparent */}
+      <mesh position={[2.1, 1.55, -4.44]}>
+        <planeGeometry args={[2.62, 2.3]} />
         <meshStandardMaterial
-          color="#C8E4FF"
+          color="#030810"
+          emissive="#0a1830"
+          emissiveIntensity={0.55}
           transparent
-          opacity={0.42}
+          opacity={0.92}
           roughness={0.0}
-          metalness={0.15}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-      {/* Horizontal divider */}
-      <mesh position={[-4.435, 1.85, -1.2]} rotation={[0, Math.PI / 2, 0]}>
-        <boxGeometry args={[2.72, 0.05, 0.025]} />
-        <meshStandardMaterial color="#FFFFFF" roughness={0.2} />
-      </mesh>
-      {/* Vertical divider */}
-      <mesh position={[-4.435, 1.85, -1.2]} rotation={[0, Math.PI / 2, 0]}>
-        <boxGeometry args={[0.05, 1.92, 0.025]} />
-        <meshStandardMaterial color="#FFFFFF" roughness={0.2} />
-      </mesh>
-      {/* Sky / city outside the window */}
-      <mesh position={[-6.2, 1.85, -1.2]} rotation={[0, Math.PI / 2, 0]}>
-        <planeGeometry args={[4, 3]} />
-        <meshStandardMaterial
-          color="#87C5E8"
-          emissive="#5AAED4"
-          emissiveIntensity={0.35}
+          metalness={0.25}
         />
       </mesh>
 
-      {/* ═══ DESK ══════════════════════════════════════════════════ */}
-      {/* Desktop surface */}
-      <mesh castShadow receiveShadow position={[0, 0.76, -3.1]}>
-        <boxGeometry args={[2.6, 0.045, 0.88]} />
-        <meshStandardMaterial color="#141414" roughness={0.22} metalness={0.12} />
+      {/* City backdrop — deep dark sky with distant glow */}
+      <mesh position={[2.1, 1.55, -5.6]}>
+        <planeGeometry args={[3.2, 3.0]} />
+        <meshStandardMaterial
+          color="#010610"
+          emissive="#0c1f3f"
+          emissiveIntensity={1.4}
+        />
       </mesh>
-      {/* Left side panel leg */}
-      <mesh castShadow receiveShadow position={[-1.23, 0.38, -3.1]}>
-        <boxGeometry args={[0.045, 0.76, 0.88]} />
-        <meshStandardMaterial color="#141414" roughness={0.22} metalness={0.12} />
+
+      {/* City light cluster — simulated glow patch */}
+      <mesh position={[2.4, 1.1, -5.5]}>
+        <planeGeometry args={[1.2, 0.7]} />
+        <meshStandardMaterial
+          color="#050f1a"
+          emissive="#1a3c60"
+          emissiveIntensity={2.5}
+        />
       </mesh>
-      {/* Right side panel leg */}
-      <mesh castShadow receiveShadow position={[1.23, 0.38, -3.1]}>
-        <boxGeometry args={[0.045, 0.76, 0.88]} />
-        <meshStandardMaterial color="#141414" roughness={0.22} metalness={0.12} />
+
+      {/* ═══ DESK — corner setup, right-of-center ════════════════════ */}
+
+      {/* Main surface — wide, pushed toward back wall */}
+      <mesh position={[0.6, 0.76, -3.5]}>
+        <boxGeometry args={[3.6, 0.045, 1.2]} />
+        <meshStandardMaterial color="#0e0e0e" roughness={0.18} metalness={0.22} />
       </mesh>
+
+      {/* Left leg panel */}
+      <mesh position={[-1.18, 0.38, -3.5]}>
+        <boxGeometry args={[0.045, 0.76, 1.2]} />
+        <meshStandardMaterial color="#0e0e0e" roughness={0.18} metalness={0.22} />
+      </mesh>
+
+      {/* Right leg panel */}
+      <mesh position={[2.38, 0.38, -3.5]}>
+        <boxGeometry args={[0.045, 0.76, 1.2]} />
+        <meshStandardMaterial color="#0e0e0e" roughness={0.18} metalness={0.22} />
+      </mesh>
+
       {/* Back modesty panel */}
-      <mesh position={[0, 0.38, -3.54]}>
-        <boxGeometry args={[2.6, 0.76, 0.04]} />
-        <meshStandardMaterial color="#141414" roughness={0.22} metalness={0.12} />
+      <mesh position={[0.6, 0.38, -4.08]}>
+        <boxGeometry args={[3.6, 0.76, 0.04]} />
+        <meshStandardMaterial color="#0c0c0c" roughness={0.18} metalness={0.22} />
       </mesh>
 
-      {/* ═══ MONITOR 1 — left ══════════════════════════════════════ */}
-      {/* Bezel */}
-      <mesh castShadow position={[-0.58, 1.24, -3.52]}>
-        <boxGeometry args={[0.66, 0.40, 0.030]} />
-        <meshStandardMaterial color="#111111" roughness={0.35} metalness={0.35} />
+      {/* Under-desk LED strip — purple glow edge */}
+      <mesh position={[0.6, 0.748, -2.92]}>
+        <boxGeometry args={[3.55, 0.007, 0.01]} />
+        <meshStandardMaterial color="#000" emissive="#9900ff" emissiveIntensity={3.0} />
       </mesh>
-      {/* Screen emissive */}
-      <mesh position={[-0.58, 1.24, -3.506]}>
-        <boxGeometry args={[0.60, 0.34, 0.008]} />
+
+      {/* ═══ MONITOR 1 — primary wide display ═══════════════════════ */}
+
+      {/* Bezel */}
+      <mesh position={[0.1, 1.38, -3.93]}>
+        <boxGeometry args={[1.22, 0.70, 0.034]} />
+        <meshStandardMaterial color="#080808" roughness={0.25} metalness={0.55} />
+      </mesh>
+
+      {/* Screen — glowing deep blue */}
+      <mesh position={[0.1, 1.38, -3.915]}>
+        <boxGeometry args={[1.12, 0.62, 0.008]} />
         <meshStandardMaterial
-          color="#0A1628"
-          emissive="#4FC3F7"
-          emissiveIntensity={0.58}
-          roughness={0.04}
-          metalness={0.1}
+          color="#030c1c"
+          emissive="#1a3a6a"
+          emissiveIntensity={1.6}
+          roughness={0.02}
+          metalness={0.08}
         />
       </mesh>
+
       {/* Stand neck */}
-      <mesh position={[-0.58, 0.94, -3.48]}>
-        <boxGeometry args={[0.042, 0.28, 0.042]} />
-        <meshStandardMaterial color="#1A1A1A" roughness={0.45} metalness={0.4} />
-      </mesh>
-      {/* Stand base */}
-      <mesh receiveShadow position={[-0.58, 0.785, -3.38]}>
-        <boxGeometry args={[0.26, 0.026, 0.20]} />
-        <meshStandardMaterial color="#1A1A1A" roughness={0.45} metalness={0.4} />
+      <mesh position={[0.1, 0.945, -3.88]}>
+        <boxGeometry args={[0.044, 0.28, 0.044]} />
+        <meshStandardMaterial color="#0f0f0f" roughness={0.35} metalness={0.65} />
       </mesh>
 
-      {/* ═══ MONITOR 2 — right ═════════════════════════════════════ */}
-      {/* Bezel */}
-      <mesh castShadow position={[0.58, 1.24, -3.52]}>
-        <boxGeometry args={[0.66, 0.40, 0.030]} />
-        <meshStandardMaterial color="#111111" roughness={0.35} metalness={0.35} />
+      {/* Stand base */}
+      <mesh position={[0.1, 0.787, -3.76]}>
+        <boxGeometry args={[0.30, 0.026, 0.24]} />
+        <meshStandardMaterial color="#0f0f0f" roughness={0.35} metalness={0.65} />
       </mesh>
-      {/* Screen emissive */}
-      <mesh position={[0.58, 1.24, -3.506]}>
-        <boxGeometry args={[0.60, 0.34, 0.008]} />
+
+      {/* ═══ MONITOR 2 — portrait (vertical) ════════════════════════ */}
+
+      {/* Bezel */}
+      <mesh position={[1.58, 1.38, -3.93]}>
+        <boxGeometry args={[0.46, 0.74, 0.034]} />
+        <meshStandardMaterial color="#080808" roughness={0.25} metalness={0.55} />
+      </mesh>
+
+      {/* Screen */}
+      <mesh position={[1.58, 1.38, -3.915]}>
+        <boxGeometry args={[0.38, 0.66, 0.008]} />
         <meshStandardMaterial
-          color="#0A1628"
-          emissive="#4FC3F7"
-          emissiveIntensity={0.58}
-          roughness={0.04}
-          metalness={0.1}
+          color="#030c1c"
+          emissive="#1a3a6a"
+          emissiveIntensity={1.6}
+          roughness={0.02}
+          metalness={0.08}
         />
       </mesh>
+
       {/* Stand neck */}
-      <mesh position={[0.58, 0.94, -3.48]}>
-        <boxGeometry args={[0.042, 0.28, 0.042]} />
-        <meshStandardMaterial color="#1A1A1A" roughness={0.45} metalness={0.4} />
+      <mesh position={[1.58, 0.945, -3.88]}>
+        <boxGeometry args={[0.044, 0.28, 0.044]} />
+        <meshStandardMaterial color="#0f0f0f" roughness={0.35} metalness={0.65} />
       </mesh>
+
       {/* Stand base */}
-      <mesh receiveShadow position={[0.58, 0.785, -3.38]}>
-        <boxGeometry args={[0.26, 0.026, 0.20]} />
-        <meshStandardMaterial color="#1A1A1A" roughness={0.45} metalness={0.4} />
+      <mesh position={[1.58, 0.787, -3.76]}>
+        <boxGeometry args={[0.24, 0.026, 0.20]} />
+        <meshStandardMaterial color="#0f0f0f" roughness={0.35} metalness={0.65} />
       </mesh>
 
-      {/* ═══ KEYBOARD (Module 4 will replace with interactive version) ═ */}
-      <mesh castShadow receiveShadow position={[0, 0.793, -2.92]}>
-        <boxGeometry args={[0.45, 0.019, 0.165]} />
-        <meshStandardMaterial color="#1C1C1C" roughness={0.55} metalness={0.06} />
+      {/* ═══ KEYBOARD ════════════════════════════════════════════════ */}
+      <mesh position={[0, 0.793, -2.92]}>
+        <boxGeometry args={[0.48, 0.018, 0.172]} />
+        <meshStandardMaterial color="#111111" roughness={0.55} metalness={0.08} />
       </mesh>
 
-      {/* ═══ MOUSE ═════════════════════════════════════════════════ */}
-      <mesh castShadow position={[0.65, 0.787, -2.92]}>
-        <boxGeometry args={[0.068, 0.026, 0.118]} />
-        <meshStandardMaterial color="#1A1A1A" roughness={0.4} metalness={0.12} />
+      {/* ═══ MOUSE ═══════════════════════════════════════════════════ */}
+      <mesh position={[0.72, 0.789, -2.92]}>
+        <boxGeometry args={[0.072, 0.025, 0.122]} />
+        <meshStandardMaterial color="#0e0e0e" roughness={0.38} metalness={0.12} />
       </mesh>
 
-      {/* ═══ DESK LAMP ═════════════════════════════════════════════ */}
-      {/* Base */}
-      <mesh receiveShadow position={[1.05, 0.784, -3.4]}>
-        <cylinderGeometry args={[0.055, 0.07, 0.048, 8]} />
-        <meshStandardMaterial color="#D0D0D0" roughness={0.25} metalness={0.75} />
+      {/* ═══ COFFEE MUG ══════════════════════════════════════════════ */}
+      <mesh position={[-0.72, 0.812, -3.28]}>
+        <cylinderGeometry args={[0.036, 0.030, 0.082, 10]} />
+        <meshStandardMaterial color="#EEEEEE" roughness={0.28} metalness={0.04} />
       </mesh>
-      {/* Stem */}
-      <mesh position={[1.05, 1.03, -3.4]}>
-        <cylinderGeometry args={[0.013, 0.013, 0.44, 6]} />
-        <meshStandardMaterial color="#C0C0C0" roughness={0.25} metalness={0.75} />
-      </mesh>
-      {/* Shade */}
-      <mesh position={[1.05, 1.26, -3.36]}>
-        <coneGeometry args={[0.135, 0.16, 8, 1, true]} />
-        <meshStandardMaterial color="#F0F0F0" roughness={0.65} side={THREE.DoubleSide} />
+      {/* Glowing rim — suggests hot coffee */}
+      <mesh position={[-0.72, 0.857, -3.28]}>
+        <cylinderGeometry args={[0.034, 0.034, 0.005, 10]} />
+        <meshStandardMaterial color="#000" emissive="#ff6020" emissiveIntensity={1.4} />
       </mesh>
 
-      {/* ═══ CHAIR ═════════════════════════════════════════════════ */}
-      {/* Seat cushion */}
-      <mesh castShadow receiveShadow position={[0, 0.52, -2.12]}>
-        <boxGeometry args={[0.60, 0.072, 0.56]} />
-        <meshStandardMaterial color="#282828" roughness={0.72} metalness={0} />
+      {/* ═══ HEADPHONES — resting on desk ═══════════════════════════ */}
+      <mesh position={[-0.28, 0.834, -3.72]}>
+        <boxGeometry args={[0.20, 0.030, 0.048]} />
+        <meshStandardMaterial color="#181818" roughness={0.45} metalness={0.35} />
       </mesh>
-      {/* Back rest */}
-      <mesh castShadow position={[0, 1.02, -2.38]}>
-        <boxGeometry args={[0.58, 0.80, 0.068]} />
-        <meshStandardMaterial color="#242424" roughness={0.72} metalness={0} />
+      <mesh position={[-0.37, 0.812, -3.72]}>
+        <boxGeometry args={[0.052, 0.062, 0.052]} />
+        <meshStandardMaterial color="#141414" roughness={0.45} metalness={0.35} />
       </mesh>
-      {/* Center hydraulic post */}
-      <mesh position={[0, 0.27, -2.12]}>
-        <cylinderGeometry args={[0.033, 0.044, 0.52, 8]} />
-        <meshStandardMaterial color="#1A1A1A" roughness={0.35} metalness={0.55} />
-      </mesh>
-      {/* Star base disk */}
-      <mesh receiveShadow position={[0, 0.04, -2.12]}>
-        <cylinderGeometry args={[0.27, 0.27, 0.042, 10]} />
-        <meshStandardMaterial color="#1A1A1A" roughness={0.35} metalness={0.55} />
-      </mesh>
-      {/* Left armrest */}
-      <mesh position={[-0.34, 0.72, -2.18]}>
-        <boxGeometry args={[0.052, 0.042, 0.36]} />
-        <meshStandardMaterial color="#282828" roughness={0.65} metalness={0} />
-      </mesh>
-      {/* Right armrest */}
-      <mesh position={[0.34, 0.72, -2.18]}>
-        <boxGeometry args={[0.052, 0.042, 0.36]} />
-        <meshStandardMaterial color="#282828" roughness={0.65} metalness={0} />
+      <mesh position={[-0.19, 0.812, -3.72]}>
+        <boxGeometry args={[0.052, 0.062, 0.052]} />
+        <meshStandardMaterial color="#141414" roughness={0.45} metalness={0.35} />
       </mesh>
 
-      {/* ═══ FLOOR PLANT — right back corner ══════════════════════ */}
-      {/* Terracotta pot */}
-      <mesh castShadow receiveShadow position={[3.6, 0.23, -3.5]}>
-        <cylinderGeometry args={[0.20, 0.14, 0.46, 12]} />
-        <meshStandardMaterial color="#C07040" roughness={0.82} metalness={0} />
+      {/* ═══ iPHONE — face-down desk ═════════════════════════════════ */}
+      <mesh position={[0.44, 0.787, -3.22]}>
+        <boxGeometry args={[0.078, 0.009, 0.162]} />
+        <meshStandardMaterial color="#1C1C1E" roughness={0.10} metalness={0.55} />
       </mesh>
-      {/* Soil top */}
-      <mesh position={[3.6, 0.47, -3.5]}>
-        <cylinderGeometry args={[0.19, 0.19, 0.022, 12]} />
-        <meshStandardMaterial color="#2A180A" roughness={1.0} metalness={0} />
+
+      {/* ═══ DESK SUCCULENT — tiny, on desk surface ══════════════════ */}
+      <mesh position={[-0.88, 0.802, -3.78]}>
+        <cylinderGeometry args={[0.030, 0.024, 0.052, 8]} />
+        <meshStandardMaterial color="#7a3a18" roughness={0.9} />
       </mesh>
-      {/* Main trunk */}
-      <mesh position={[3.6, 0.92, -3.5]}>
-        <cylinderGeometry args={[0.026, 0.033, 0.88, 6]} />
-        <meshStandardMaterial color="#3D6B2A" roughness={0.88} metalness={0} />
+      <mesh position={[-0.88, 0.852, -3.78]}>
+        <sphereGeometry args={[0.044, 7, 6]} />
+        <meshStandardMaterial color="#2E7D32" roughness={0.92} />
       </mesh>
-      {/* Top foliage — main cluster */}
-      <mesh castShadow position={[3.6, 1.55, -3.5]}>
-        <sphereGeometry args={[0.42, 9, 8]} />
-        <meshStandardMaterial color="#2E6020" roughness={0.88} metalness={0} />
+
+      {/* ═══ CHAIR — high-back, dark ══════════════════════════════════ */}
+      <mesh position={[0, 0.50, -2.12]}>
+        <boxGeometry args={[0.62, 0.07, 0.58]} />
+        <meshStandardMaterial color="#181818" roughness={0.82} />
       </mesh>
-      {/* Side foliage 1 */}
-      <mesh castShadow position={[3.4, 1.30, -3.3]}>
-        <sphereGeometry args={[0.25, 8, 7]} />
-        <meshStandardMaterial color="#377228" roughness={0.88} metalness={0} />
+      <mesh position={[0, 1.08, -2.40]}>
+        <boxGeometry args={[0.60, 0.96, 0.07]} />
+        <meshStandardMaterial color="#151515" roughness={0.82} />
       </mesh>
-      {/* Side foliage 2 */}
-      <mesh castShadow position={[3.82, 1.24, -3.68]}>
-        <sphereGeometry args={[0.22, 8, 7]} />
-        <meshStandardMaterial color="#2A5A1E" roughness={0.88} metalness={0} />
+      <mesh position={[0, 0.26, -2.12]}>
+        <cylinderGeometry args={[0.032, 0.044, 0.50, 7]} />
+        <meshStandardMaterial color="#0f0f0f" roughness={0.28} metalness={0.62} />
+      </mesh>
+      <mesh position={[0, 0.03, -2.12]}>
+        <cylinderGeometry args={[0.28, 0.28, 0.04, 8]} />
+        <meshStandardMaterial color="#0f0f0f" roughness={0.28} metalness={0.62} />
+      </mesh>
+      <mesh position={[-0.35, 0.70, -2.18]}>
+        <boxGeometry args={[0.050, 0.040, 0.38]} />
+        <meshStandardMaterial color="#181818" roughness={0.75} />
+      </mesh>
+      <mesh position={[0.35, 0.70, -2.18]}>
+        <boxGeometry args={[0.050, 0.040, 0.38]} />
+        <meshStandardMaterial color="#181818" roughness={0.75} />
+      </mesh>
+
+      {/* ═══ BED — low platform, against left wall ═══════════════════ */}
+      <mesh position={[-3.2, 0.20, -2.3]}>
+        <boxGeometry args={[2.5, 0.20, 2.0]} />
+        <meshStandardMaterial color="#111111" roughness={0.65} metalness={0.08} />
+      </mesh>
+      <mesh position={[-3.2, 0.38, -2.3]}>
+        <boxGeometry args={[2.3, 0.20, 1.82]} />
+        <meshStandardMaterial color="#1c1614" roughness={0.95} />
+      </mesh>
+      <mesh position={[-3.2, 0.51, -3.15]}>
+        <boxGeometry args={[1.7, 0.10, 0.44]} />
+        <meshStandardMaterial color="#242020" roughness={0.95} />
+      </mesh>
+      <mesh position={[-3.1, 0.50, -1.6]}>
+        <boxGeometry args={[1.9, 0.14, 0.65]} />
+        <meshStandardMaterial color="#1a1818" roughness={0.95} />
+      </mesh>
+
+      {/* ═══ WALL POSTERS — back wall, left side ═════════════════════ */}
+      <mesh position={[-3.4, 2.12, -4.47]}>
+        <boxGeometry args={[0.65, 0.90, 0.018]} />
+        <meshStandardMaterial color="#0e0e0e" roughness={0.8} />
+      </mesh>
+      <mesh position={[-3.4, 2.12, -4.46]}>
+        <planeGeometry args={[0.57, 0.82]} />
+        <meshStandardMaterial color="#080812" emissive="#151528" emissiveIntensity={0.35} />
+      </mesh>
+
+      <mesh position={[-2.55, 2.12, -4.47]}>
+        <boxGeometry args={[0.65, 0.90, 0.018]} />
+        <meshStandardMaterial color="#0e0e0e" roughness={0.8} />
+      </mesh>
+      <mesh position={[-2.55, 2.12, -4.46]}>
+        <planeGeometry args={[0.57, 0.82]} />
+        <meshStandardMaterial color="#081008" emissive="#152015" emissiveIntensity={0.35} />
+      </mesh>
+
+      <mesh position={[-1.65, 2.12, -4.47]}>
+        <boxGeometry args={[0.58, 0.82, 0.018]} />
+        <meshStandardMaterial color="#0e0e0e" roughness={0.8} />
+      </mesh>
+      <mesh position={[-1.65, 2.12, -4.46]}>
+        <planeGeometry args={[0.50, 0.74]} />
+        <meshStandardMaterial color="#100808" emissive="#201515" emissiveIntensity={0.35} />
       </mesh>
     </>
   )
