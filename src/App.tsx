@@ -4,6 +4,7 @@ import { Perf } from 'r3f-perf'
 import MainRoom from './components/canvas/MainRoom'
 import CameraRig from './components/canvas/CameraRig'
 import CurvePath from './components/canvas/CurvePath'
+import KeyboardHub from './components/canvas/KeyboardHub'
 
 // All props defined outside component — stable references, never break React.memo
 const canvasGl = { antialias: false } as const
@@ -29,6 +30,7 @@ export default function App() {
 
         <CameraRig />
         <MainRoom />
+        <KeyboardHub />
       </Canvas>
 
       {/* Scroll spacer — creates the scrollable document height Lenis reads from */}

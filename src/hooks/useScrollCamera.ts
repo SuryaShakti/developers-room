@@ -14,11 +14,19 @@ export function useScrollCamera() {
   // Both are refs — never read inside useFrame from React state directly.
   const targetRef = useRef(0)
   const currentRef = useRef(0)
+  const keyboardVisibleRef = useRef(false)
 
   useEffect(() =>
     useStore.subscribe(
       (s) => s.scrollProgress,
-      (v) => { targetRef.current = v }
+      (v) => {
+        targetRef.current = v
+        const shouldShow = v > 0.72
+        if (shouldShow !== keyboardVisibleRef.current) {
+          keyboardVisibleRef.current = shouldShow
+          useStore.getState().setKeyboardVisible(shouldShow)
+        }
+      }
     )
   , [])
 
