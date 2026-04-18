@@ -15,18 +15,27 @@ export function useScrollCamera() {
   const targetRef = useRef(0)
   const currentRef = useRef(0)
   const keyboardVisibleRef = useRef(false)
+  const activeRoomRef = useRef('main')
 
   useEffect(() =>
     useStore.subscribe(
       (s) => s.scrollProgress,
       (v) => {
         targetRef.current = v
+        if (activeRoomRef.current !== 'main') return
         const shouldShow = v > 0.72
         if (shouldShow !== keyboardVisibleRef.current) {
           keyboardVisibleRef.current = shouldShow
           useStore.getState().setKeyboardVisible(shouldShow)
         }
       }
+    )
+  , [])
+
+  useEffect(() =>
+    useStore.subscribe(
+      (s) => s.activeRoom,
+      (v) => { activeRoomRef.current = v }
     )
   , [])
 
@@ -37,8 +46,8 @@ export function useScrollCamera() {
   }, [camera])
 
   useFrame((_, delta) => {
-    // Exponential decay smoothing — frame-rate independent via MathUtils.damp
-    // lambda=6: reaches 99% of target in ~0.77s at 60fps. Feels like weighted scroll.
+    if (activeRoomRef.current !== 'main') return
+
     currentRef.current = THREE.MathUtils.damp(
       currentRef.current,
       targetRef.current,
