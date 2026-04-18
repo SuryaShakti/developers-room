@@ -2,9 +2,14 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import Lenis from 'lenis'
 import { getGPUTier } from 'detect-gpu'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useStore } from './store/useStore'
 import App from './App'
 import './index.css'
+
+// Register GSAP plugins once at app entry
+gsap.registerPlugin(ScrollTrigger)
 
 // Prevent browser restoring scroll position on reload — must happen before Lenis init
 history.scrollRestoration = 'manual'
@@ -13,6 +18,8 @@ history.scrollRestoration = 'manual'
 const lenis = new Lenis({ autoRaf: false })
 
 lenis.on('scroll', () => {
+  // Keep GSAP ScrollTrigger scrub in sync with Lenis — never let them tick independently
+  ScrollTrigger.update()
   useStore.getState().setScrollProgress(lenis.progress)
 })
 
