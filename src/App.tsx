@@ -10,7 +10,7 @@ const canvasGl = { antialias: false } as const
 const canvasDpr: [number, number] = [1, 1.5]
 const canvasShadows = { type: PCFSoftShadowMap } as const
 // Initial position matches scrollCurve.getPoint(0) — no single-frame pop on mount
-const canvasCamera = { position: [0, 3.5, 14] as [number, number, number], fov: 60 }
+const canvasCamera = { position: [0, 3.8, 10] as [number, number, number], fov: 60 }
 const canvasStyle = { position: 'fixed' as const, top: 0, left: 0, width: '100%', height: '100%' }
 const scrollSpacerStyle = { height: '300vh', pointerEvents: 'none' as const }
 
